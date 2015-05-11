@@ -1,0 +1,30 @@
+#layout{
+	padding-left: 252px;
+}
+.objects_item_td_pos{
+	position: relative !important;
+}
+.cian-ext{
+	position: fixed;
+	top:0;
+	bottom: 0;
+	left: 0;
+	width: 250px;
+	overflow: scroll;
+	z-index: 10000000;
+	border-right: 2px solid #ccc;
+	background: #fff;
+}
+.cian-ext__star{
+	position: absolute;
+	top:0;
+	left: 0;
+	width: 40px;
+	height: 40px;
+	background: red;
+}
+.cian-ext__list{
+	h4{
+		margin: 0;
+	}
+}

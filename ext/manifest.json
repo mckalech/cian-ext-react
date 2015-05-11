@@ -1,0 +1,24 @@
+{
+	"name": "cian-ext",
+	"version": "0.0.1",
+	"manifest_version": 2,
+	"permissions": [
+		"storage",
+		"http://cian.ru/",
+		"http://*/*"
+	],
+	"content_scripts": [
+		{
+			"matches":[ "http://www.cian.ru/*" ],
+			"css": [
+				"build/styles.css"
+			]
+		},
+		{
+			"matches":[ "http://www.cian.ru/*" ],
+			"js": [
+				"build/app.js"
+			]
+		}
+	]
+}
