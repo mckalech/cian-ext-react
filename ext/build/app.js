@@ -2,13 +2,13 @@
 var $ = require('jQuery'),
 Box = require('./box'),
 React = require('React');
-var $container = $('<div />').addClass('cian-ext');
+var $container = $('<div />').addClass('cian-sidebar');
 $('body').append($container);
-React.render(React.createElement(Box, null), $('.cian-ext').get(0));
+React.render(React.createElement(Box, null), $('.cian-sidebar').get(0));
 
 var $table = $('.objects_items_list');
 $table.find('.objects_item_td_pos').each(function(ind, el) {
-	var $star = $('<div />').addClass('cian-ext__star'); 
+	var $star = $('<div />').addClass('cian-ext-site__star'); 
 	$(this).prepend($star);
 })
 },{"./box":2,"React":160,"jQuery":162}],2:[function(require,module,exports){
@@ -34,7 +34,7 @@ var Box = React.createClass({displayName: "Box",
 			});
 		};
 			
-		$('.objects_items_list').on('click','.cian-ext__star', function(){
+		$('.objects_items_list').on('click','.cian-ext-site__star', function(){
 			var id = $(this).closest('tr').attr('id');
 			id = parseInt(id.replace('offer_', ''));
 			that.addFlat(id);
@@ -46,7 +46,7 @@ var Box = React.createClass({displayName: "Box",
 		if(containsFlat<0){
 			flats = flats.concat({
 				id:id,
-				name: 'ff'+id,
+				comment: '',
 				cached: false,
 				adress: 'no data',
 				editing: false,
@@ -54,6 +54,7 @@ var Box = React.createClass({displayName: "Box",
 			});
 			this.setState({flats: flats});
 			Storage.set('flats', flats);
+			$(".cian-sidebar").animate({ scrollTop: $(".cian-sidebar__list").height() }, 1000);// ------------------FIX THIS TO REACT--------------------------
 		}else{
 			alert('This flat is already in the list');
 		}
@@ -75,10 +76,10 @@ var Box = React.createClass({displayName: "Box",
 		this.setState({flats: flats});
 		Storage.set('flats', flats);
 	},
-	updateFlatName:function(id, name){
+	updateFlatComment:function(id, comment){
 		var flats = this.state.flats,
 		ind = this.findById(flats, id);
-		flats[ind].name = name;
+		flats[ind].comment = comment;
 		this.setState({flats: flats});
 		Storage.set('flats', flats);
 	},
@@ -89,17 +90,20 @@ var Box = React.createClass({displayName: "Box",
 				React.createElement(Flat, {
 					id: item.id, 
 					cached: item.cached, 
-					name: item.name, 
+					comment: item.comment, 
 					price: item.price, 
 					adress: item.adress, 
 					updateFlat: that.updateFlat, 
-					updateFlatName: that.updateFlatName})
+					updateFlatComment: that.updateFlatComment, 
+					deleteFlat: that.removeFlat})
 			);
 		});
 		return (
-			React.createElement("div", {className: "cian-ext__list"}, 
-				React.createElement("h1", null, "Избранное"), 
-				flats
+			React.createElement("div", {className: "cian-sidebar__list"}, 
+				React.createElement("h1", {className: "cian-sidebar__heading"}, "Избранное"), 
+				React.createElement("div", {className: "cian-sidebar__flats"}, 
+					flats
+				)
 			)
 		);
 	}
@@ -110,7 +114,7 @@ var $ = require('jQuery');
 
 module.exports = {
 	get:function(id, callback) {
-		//setTimeout(function(){
+		setTimeout(function(){
 			$.ajax({
 				url:'http://www.cian.ru/rent/flat/'+id+'/',
 				success:function(response){
@@ -123,19 +127,20 @@ module.exports = {
 					callback(data);
 				}
 			});	
-		//},3000)
+		},1500)
 		
 	}
 }
 },{"jQuery":162}],4:[function(require,module,exports){
 var FlatDataService = require('./flatdataservice'),
+$ = require('jQuery'),
 React = require('React');
 
 var Flat = React.createClass({displayName: "Flat",
 	getInitialState: function(){
 		return {
 			editing:false,
-			name: this.props.name
+			comment: this.props.comment
 		}
 	},
 	componentDidMount:function(){
@@ -146,43 +151,66 @@ var Flat = React.createClass({displayName: "Flat",
 			});
 		}
 	},
-	editName:function(){
-		var that = this;
+	editComment:function(){
+		var that = this,
+		input = React.findDOMNode(that.refs.commentInput);
 		this.setState({editing:true});
 		setTimeout(function(){
-			React.findDOMNode(that.refs.nameInput).focus()
+			input.focus();
+			input.setSelectionRange(input.value.length, input.value.length);   
 		}, 0);
 	},
 	handleChange: function(event) {
-		this.setState({name: event.target.value});
+		this.setState({comment: event.target.value});
 	},
-	inputBlur:function(){
+	inputBlur:function(e){
 		this.setState({editing:false});
-		this.props.updateFlatName(this.props.id, this.state.name);
-
+		this.props.updateFlatComment(this.props.id, this.state.comment);
+		e.preventDefault();
+	},
+	handleDelete: function(event) {
+		var that = this;
+		//$(React.findDOMNode(that.refs.container)).slideUp(function(){// ------------------FIX THIS TO REACT--------------------------
+			that.props.deleteFlat(that.props.id);
+		//});
 	},
 	render : function(){
-		return (
-			React.createElement("div", {className: "flatitem"}, 
-				React.createElement("input", {ref: "nameInput", 
-					onChange: this.handleChange, 
-					onBlur: this.inputBlur, 
-					value: this.state.name, 
-					className: this.state.editing ? "shown" : "hidden"}), 
-				React.createElement("h4", {className: this.state.editing ? "hidden" :"shown"}, 	
-					React.createElement("span", null, this.state.name), 
-					React.createElement("span", {onClick: this.editName}, "edit")
-				), 
-				React.createElement("div", null, "id: ", this.props.id), 
-				React.createElement("div", null, this.props.adress), 
-				React.createElement("div", null, this.props.price), 
-				"cached:", this.props.cached? 'cached':'non-cached'
+		var html;
+		if(this.props.cached){
+			html = (
+				React.createElement("div", {className: "cian-sidebar__flat", ref: "container"}, 
+					React.createElement("div", {className: "cian-sidebar__info"}, 
+						React.createElement("div", {className: "cian-sidebar__adress"}, this.props.adress), 
+						React.createElement("div", {className: "cian-sidebar__price"}, this.props.price), 
+						React.createElement("form", {onSubmit: this.inputBlur}, 
+							React.createElement("input", {ref: "commentInput", 
+								onChange: this.handleChange, 
+								onBlur: this.inputBlur, 
+								value: this.state.comment, 
+								className: this.state.editing ? "ext-shown" : "ext-hidden"})
+						), 
+						React.createElement("div", {className: this.state.editing ? "ext-hidden" :"ext-shown"}, 	
+							React.createElement("span", null, this.state.comment)
+						)
+					), 
+					React.createElement("div", {className: "cian-sidebar__actions"}, 
+						React.createElement("span", {onClick: this.handleDelete, className: "cian-sidebar__icon cian-sidebar__icon_remove"}), 
+						React.createElement("span", {onClick: this.editComment, className: "cian-sidebar__icon cian-sidebar__icon_edit"})
+					)
+				)
+			);
+		}else{
+			html = (
+				React.createElement("div", {className: "cian-sidebar__flat"}, 
+					"Caching"
+				)
 			)
-		);
+		}
+		return html;
 	}
 });
 module.exports = Flat;
-},{"./flatdataservice":3,"React":160}],5:[function(require,module,exports){
+},{"./flatdataservice":3,"React":160,"jQuery":162}],5:[function(require,module,exports){
 module.exports = {
 	get:function(name) {
 		var data;

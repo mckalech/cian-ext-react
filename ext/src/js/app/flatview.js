@@ -1,11 +1,12 @@
 var FlatDataService = require('./flatdataservice'),
+$ = require('jQuery'),
 React = require('React');
 
 var Flat = React.createClass({
 	getInitialState: function(){
 		return {
 			editing:false,
-			name: this.props.name
+			comment: this.props.comment
 		}
 	},
 	componentDidMount:function(){
@@ -16,39 +17,62 @@ var Flat = React.createClass({
 			});
 		}
 	},
-	editName:function(){
-		var that = this;
+	editComment:function(){
+		var that = this,
+		input = React.findDOMNode(that.refs.commentInput);
 		this.setState({editing:true});
 		setTimeout(function(){
-			React.findDOMNode(that.refs.nameInput).focus()
+			input.focus();
+			input.setSelectionRange(input.value.length, input.value.length);   
 		}, 0);
 	},
 	handleChange: function(event) {
-		this.setState({name: event.target.value});
+		this.setState({comment: event.target.value});
 	},
-	inputBlur:function(){
+	inputBlur:function(e){
 		this.setState({editing:false});
-		this.props.updateFlatName(this.props.id, this.state.name);
-
+		this.props.updateFlatComment(this.props.id, this.state.comment);
+		e.preventDefault();
+	},
+	handleDelete: function(event) {
+		var that = this;
+		//$(React.findDOMNode(that.refs.container)).slideUp(function(){// ------------------FIX THIS TO REACT--------------------------
+			that.props.deleteFlat(that.props.id);
+		//});
 	},
 	render : function(){
-		return (
-			<div className="flatitem">
-				<input ref="nameInput" 
-					onChange={this.handleChange} 
-					onBlur={this.inputBlur} 
-					value={this.state.name}
-					className={this.state.editing ? "shown" : "hidden" } />
-				<h4 className={this.state.editing ? "hidden" :"shown" } >	
-					<span>{this.state.name}</span> 
-					<span onClick={this.editName}>edit</span>
-				</h4>
-				<div>id: {this.props.id}</div>
-				<div>{this.props.adress}</div>
-				<div>{this.props.price}</div>
-				cached:{this.props.cached? 'cached':'non-cached'}
-			</div>
-		);
+		var html;
+		if(this.props.cached){
+			html = (
+				<div className="cian-sidebar__flat" ref="container">
+					<div className="cian-sidebar__info">
+						<div className="cian-sidebar__adress">{this.props.adress}</div>
+						<div className="cian-sidebar__price">{this.props.price}</div>
+						<form onSubmit={this.inputBlur} >
+							<input ref="commentInput" 
+								onChange={this.handleChange} 
+								onBlur={this.inputBlur} 
+								value={this.state.comment}
+								className={this.state.editing ? "ext-shown" : "ext-hidden" } />
+						</form>
+						<div className={this.state.editing ? "ext-hidden" :"ext-shown" } >	
+							<span>{this.state.comment}</span> 
+						</div>
+					</div>
+					<div className="cian-sidebar__actions">
+						<span onClick={this.handleDelete} className="cian-sidebar__icon cian-sidebar__icon_remove"></span>
+						<span onClick={this.editComment} className="cian-sidebar__icon cian-sidebar__icon_edit"></span>
+					</div>
+				</div>
+			);
+		}else{
+			html = (
+				<div className="cian-sidebar__flat">
+					Caching
+				</div>
+			)
+		}
+		return html;
 	}
 });
 module.exports = Flat;

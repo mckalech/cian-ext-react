@@ -20,7 +20,7 @@ var Box = React.createClass({
 			});
 		};
 			
-		$('.objects_items_list').on('click','.cian-ext__star', function(){
+		$('.objects_items_list').on('click','.cian-ext-site__star', function(){
 			var id = $(this).closest('tr').attr('id');
 			id = parseInt(id.replace('offer_', ''));
 			that.addFlat(id);
@@ -32,7 +32,7 @@ var Box = React.createClass({
 		if(containsFlat<0){
 			flats = flats.concat({
 				id:id,
-				name: 'ff'+id,
+				comment: '',
 				cached: false,
 				adress: 'no data',
 				editing: false,
@@ -40,6 +40,7 @@ var Box = React.createClass({
 			});
 			this.setState({flats: flats});
 			Storage.set('flats', flats);
+			$(".cian-sidebar").animate({ scrollTop: $(".cian-sidebar__list").height() }, 1000);// ------------------FIX THIS TO REACT--------------------------
 		}else{
 			alert('This flat is already in the list');
 		}
@@ -61,10 +62,10 @@ var Box = React.createClass({
 		this.setState({flats: flats});
 		Storage.set('flats', flats);
 	},
-	updateFlatName:function(id, name){
+	updateFlatComment:function(id, comment){
 		var flats = this.state.flats,
 		ind = this.findById(flats, id);
-		flats[ind].name = name;
+		flats[ind].comment = comment;
 		this.setState({flats: flats});
 		Storage.set('flats', flats);
 	},
@@ -75,17 +76,20 @@ var Box = React.createClass({
 				<Flat 
 					id={item.id} 
 					cached={item.cached} 
-					name={item.name} 
+					comment={item.comment} 
 					price={item.price} 
 					adress={item.adress}
 					updateFlat={that.updateFlat} 
-					updateFlatName={that.updateFlatName} />
+					updateFlatComment={that.updateFlatComment} 
+					deleteFlat={that.removeFlat} />
 			);
 		});
 		return (
-			<div className="cian-ext__list">
-				<h1>Избранное</h1>
-				{flats}
+			<div className="cian-sidebar__list">
+				<h1 className="cian-sidebar__heading">Избранное</h1>
+				<div className="cian-sidebar__flats">
+					{flats}
+				</div>
 			</div>
 		);
 	}

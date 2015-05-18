@@ -2,7 +2,7 @@ var $ = require('jQuery');
 
 module.exports = {
 	get:function(id, callback) {
-		//setTimeout(function(){
+		setTimeout(function(){
 			$.ajax({
 				url:'http://www.cian.ru/rent/flat/'+id+'/',
 				success:function(response){
@@ -15,7 +15,7 @@ module.exports = {
 					callback(data);
 				}
 			});	
-		//},3000)
+		},1500)
 		
 	}
 }
