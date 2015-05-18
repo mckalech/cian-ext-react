@@ -1,6 +1,7 @@
 var FlatDataService = require('./flatdataservice'),
 $ = require('jQuery'),
-React = require('React');
+React = require('React'),
+classNames = require('classNames');
 
 var Flat = React.createClass({
 	getInitialState: function(){
@@ -41,7 +42,11 @@ var Flat = React.createClass({
 		//});
 	},
 	render : function(){
-		var html;
+		var html,
+		commentClasses = classNames({
+			'ext-hidden': this.state.editing,
+			'cian-sidebar__comment': true
+		});
 		if(this.props.cached){
 			html = (
 				<div className="cian-sidebar__flat" ref="container">
@@ -55,7 +60,7 @@ var Flat = React.createClass({
 								value={this.state.comment}
 								className={this.state.editing ? "ext-shown" : "ext-hidden" } />
 						</form>
-						<div className={this.state.editing ? "ext-hidden" :"ext-shown" } >	
+						<div className={commentClasses} >	
 							<span>{this.state.comment}</span> 
 						</div>
 					</div>
