@@ -1,6 +1,6 @@
 var FlatDataService = require('./flatdataservice'),
 $ = require('jQuery'),
-React = require('React'),
+React = require('React/addons'),
 classNames = require('classNames');
 
 var Flat = React.createClass({
@@ -36,9 +36,10 @@ var Flat = React.createClass({
 		e.preventDefault();
 	},
 	handleDelete: function(event) {
-		var that = this;
-		//$(React.findDOMNode(that.refs.container)).slideUp(function(){// ------------------FIX THIS TO REACT--------------------------
-			that.props.deleteFlat(that.props.id);
+		var that = this,
+		$el = $(React.findDOMNode(that.refs.container));
+		//$(React.findDOMNode(that.refs.container)).fadeOut(3000,function(){// ------------------FIX THIS TO REACT-------------------------- 
+		that.props.deleteFlat(that.props.id);
 		//});
 	},
 	render : function(){

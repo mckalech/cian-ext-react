@@ -58,3 +58,20 @@
 .cian-sidebar__comment{
 	color:#888;
 }
+
+.flat-enter {
+	opacity: 0.01;
+	transition: opacity .5s ease-in;
+}
+
+.flat-enter.flat-enter-active {
+	opacity: 1;
+}
+.flat-leave {
+	opacity: 1;
+	transition: opacity .1s ease-in;
+}
+
+.flat-leave.flat-leave-active {
+	opacity: 0.01;
+}

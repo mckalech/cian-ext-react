@@ -3,7 +3,8 @@ var Storage = require('./storage'),
 	$ = require('jQuery'),
 	_ = require('underscore'),
 	React = require('React'),
-	Flat = require('./flatview');
+	Flat = require('./flatview'),
+	ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
 var Box = React.createClass({
 	getInitialState: function(){
@@ -74,6 +75,7 @@ var Box = React.createClass({
 		var flats = this.state.flats.map(function(item, i){
 			return(
 				<Flat 
+					key={item.id}
 					id={item.id} 
 					cached={item.cached} 
 					comment={item.comment} 
@@ -88,7 +90,9 @@ var Box = React.createClass({
 			<div className="cian-sidebar__list">
 				<h1 className="cian-sidebar__heading">Избранное</h1>
 				<div className="cian-sidebar__flats">
-					{flats}
+					<ReactCSSTransitionGroup transitionName="flat">
+						{flats}
+					</ReactCSSTransitionGroup>
 				</div>
 			</div>
 		);
