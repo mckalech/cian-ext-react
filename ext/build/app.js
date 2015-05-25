@@ -120,6 +120,7 @@ module.exports = {
 						price : $html.find('.object_descr_price').text(),
 						photo : $html.find('.object_descr_images_w').length ? $html.find('.object_descr_images_w img').first().attr('src') : null,
 						rooms: parseInt($html.find('.object_descr_title').text()),
+						metro: $html.find('.object_descr_metro').find('.object_descr_metro_comment').remove().end().text(),
 						cached : true
 					}
 					callback(data);
@@ -205,6 +206,7 @@ var Flat = React.createClass({displayName: "Flat",
 				React.createElement("div", {className: "cian-sidebar__flat", ref: "container"}, 
 					React.createElement("div", {className: "cian-sidebar__info"}, 
 						React.createElement("div", {className: "cian-sidebar__adress"}, this.props.item.adress), 
+						React.createElement("div", {className: "cian-sidebar__metro"}, "Метро: ", this.props.item.metro), 
 						React.createElement("div", {className: "cian-sidebar__price"}, this.props.item.price), 
 						rooms, 
 						React.createElement("form", {onSubmit: this.inputBlur}, 

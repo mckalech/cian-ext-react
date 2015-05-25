@@ -73,6 +73,7 @@ var Flat = React.createClass({
 				<div className="cian-sidebar__flat" ref="container">
 					<div className="cian-sidebar__info">
 						<div className="cian-sidebar__adress">{this.props.item.adress}</div>
+						<div className="cian-sidebar__metro">Метро: {this.props.item.metro}</div>
 						<div className="cian-sidebar__price">{this.props.item.price}</div>
 						{rooms}
 						<form onSubmit={this.inputBlur} >
@@ -84,7 +85,7 @@ var Flat = React.createClass({
 						</form>
 						<div className={commentClasses} >	
 							<span>{this.state.comment}</span> 
-						</div>
+						</div> 
 						{photo}
 					</div>
 					<div className="cian-sidebar__actions">
