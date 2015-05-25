@@ -33,11 +33,7 @@ var Box = React.createClass({
 		if(containsFlat<0){
 			flats = flats.concat({
 				id:id,
-				comment: '',
 				cached: false,
-				adress: 'no data',
-				editing: false,
-				price:0
 			});
 			this.setState({flats: flats});
 			Storage.set('flats', flats);
@@ -76,11 +72,7 @@ var Box = React.createClass({
 			return(
 				<Flat 
 					key={item.id}
-					id={item.id} 
-					cached={item.cached} 
-					comment={item.comment} 
-					price={item.price} 
-					adress={item.adress}
+					item={item}
 					updateFlat={that.updateFlat} 
 					updateFlatComment={that.updateFlatComment} 
 					deleteFlat={that.removeFlat} />

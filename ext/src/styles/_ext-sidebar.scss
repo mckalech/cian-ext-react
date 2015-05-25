@@ -58,7 +58,22 @@
 .cian-sidebar__comment{
 	color:#888;
 }
+.cian-sidebar__photo{
+	display: none;
+	overflow: hidden;
+	max-height: 150px;
 
+	&_shown{
+		display: block;
+	}
+	img{
+		max-height: 150px;
+		display: block;
+	}
+}
+.cian-sidebar__photo-toggle{
+	cursor: pointer;
+}
 .flat-enter {
 	opacity: 0.01;
 	transition: opacity .5s ease-in;
@@ -69,7 +84,7 @@
 }
 .flat-leave {
 	opacity: 1;
-	transition: opacity .1s ease-in;
+	transition: opacity .5s ease-in;
 }
 
 .flat-leave.flat-leave-active {

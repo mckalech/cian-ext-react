@@ -47,11 +47,7 @@ var Box = React.createClass({displayName: "Box",
 		if(containsFlat<0){
 			flats = flats.concat({
 				id:id,
-				comment: '',
 				cached: false,
-				adress: 'no data',
-				editing: false,
-				price:0
 			});
 			this.setState({flats: flats});
 			Storage.set('flats', flats);
@@ -90,11 +86,7 @@ var Box = React.createClass({displayName: "Box",
 			return(
 				React.createElement(Flat, {
 					key: item.id, 
-					id: item.id, 
-					cached: item.cached, 
-					comment: item.comment, 
-					price: item.price, 
-					adress: item.adress, 
+					item: item, 
 					updateFlat: that.updateFlat, 
 					updateFlatComment: that.updateFlatComment, 
 					deleteFlat: that.removeFlat})
@@ -123,9 +115,11 @@ module.exports = {
 				url:'http://www.cian.ru/rent/flat/'+id+'/',
 				success:function(response){
 					var $html = $("<div>").html(response),
-					data={
+					data = {
 						adress : $html.find('.object_descr_addr').text(),
 						price : $html.find('.object_descr_price').text(),
+						photo : $html.find('.object_descr_images_w').length ? $html.find('.object_descr_images_w img').first().attr('src') : null,
+						rooms: parseInt($html.find('.object_descr_title').text()),
 						cached : true
 					}
 					callback(data);
@@ -145,14 +139,15 @@ var Flat = React.createClass({displayName: "Flat",
 	getInitialState: function(){
 		return {
 			editing:false,
-			comment: this.props.comment
+			photoShown: false,
+			comment: this.props.item.comment
 		}
 	},
 	componentDidMount:function(){
 		var that = this;
-		if(!that.props.cached){
-			FlatDataService.get(that.props.id, function(data){
-				that.props.updateFlat(that.props.id, data);
+		if(!that.props.item.cached){
+			FlatDataService.get(that.props.item.id, function(data){
+				that.props.updateFlat(that.props.item.id, data);
 			});
 		}
 	},
@@ -170,28 +165,48 @@ var Flat = React.createClass({displayName: "Flat",
 	},
 	inputBlur:function(e){
 		this.setState({editing:false});
-		this.props.updateFlatComment(this.props.id, this.state.comment);
+		this.props.updateFlatComment(this.props.item.id, this.state.comment);
 		e.preventDefault();
 	},
 	handleDelete: function(event) {
 		var that = this,
 		$el = $(React.findDOMNode(that.refs.container));
-		//$(React.findDOMNode(that.refs.container)).fadeOut(3000,function(){// ------------------FIX THIS TO REACT-------------------------- 
-		that.props.deleteFlat(that.props.id);
-		//});
+		that.props.deleteFlat(that.props.item.id);
+	},
+	togglePhoto: function(){
+		this.setState({
+			photoShown: !this.state.photoShown
+		});
 	},
 	render : function(){
 		var html,
 		commentClasses = classNames({
 			'ext-hidden': this.state.editing,
 			'cian-sidebar__comment': true
-		});
-		if(this.props.cached){
+		}),
+		photoClasses = classNames({
+			'cian-sidebar__photo_shown': this.state.photoShown,
+			'cian-sidebar__photo': true
+		}),
+		photo = this.props.item.photo ? (
+			React.createElement("div", {className: "cian-sidebar__photo-wrapper"}, 
+				React.createElement("span", {className: "cian-sidebar__photo-toggle", onClick: this.togglePhoto}, this.state.photoShown ? 'Скрыть фото' : 'Показать фото'), 
+				React.createElement("div", {className: photoClasses}, 
+					React.createElement("img", {src: this.props.item.photo})
+				)
+			)
+		) : '',
+		rooms = this.props.item.rooms ? (
+			React.createElement("div", {className: "cian-sidebar__rooms"}, this.props.item.rooms, " комн. кв.")
+		) : '';
+
+		if(this.props.item.cached){
 			html = (
 				React.createElement("div", {className: "cian-sidebar__flat", ref: "container"}, 
 					React.createElement("div", {className: "cian-sidebar__info"}, 
-						React.createElement("div", {className: "cian-sidebar__adress"}, this.props.adress), 
-						React.createElement("div", {className: "cian-sidebar__price"}, this.props.price), 
+						React.createElement("div", {className: "cian-sidebar__adress"}, this.props.item.adress), 
+						React.createElement("div", {className: "cian-sidebar__price"}, this.props.item.price), 
+						rooms, 
 						React.createElement("form", {onSubmit: this.inputBlur}, 
 							React.createElement("input", {ref: "commentInput", 
 								onChange: this.handleChange, 
@@ -201,7 +216,8 @@ var Flat = React.createClass({displayName: "Flat",
 						), 
 						React.createElement("div", {className: commentClasses}, 	
 							React.createElement("span", null, this.state.comment)
-						)
+						), 
+						photo
 					), 
 					React.createElement("div", {className: "cian-sidebar__actions"}, 
 						React.createElement("span", {onClick: this.handleDelete, className: "cian-sidebar__icon cian-sidebar__icon_remove"}), 

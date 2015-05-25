@@ -7,14 +7,15 @@ var Flat = React.createClass({
 	getInitialState: function(){
 		return {
 			editing:false,
-			comment: this.props.comment
+			photoShown: false,
+			comment: this.props.item.comment
 		}
 	},
 	componentDidMount:function(){
 		var that = this;
-		if(!that.props.cached){
-			FlatDataService.get(that.props.id, function(data){
-				that.props.updateFlat(that.props.id, data);
+		if(!that.props.item.cached){
+			FlatDataService.get(that.props.item.id, function(data){
+				that.props.updateFlat(that.props.item.id, data);
 			});
 		}
 	},
@@ -32,28 +33,48 @@ var Flat = React.createClass({
 	},
 	inputBlur:function(e){
 		this.setState({editing:false});
-		this.props.updateFlatComment(this.props.id, this.state.comment);
+		this.props.updateFlatComment(this.props.item.id, this.state.comment);
 		e.preventDefault();
 	},
 	handleDelete: function(event) {
 		var that = this,
 		$el = $(React.findDOMNode(that.refs.container));
-		//$(React.findDOMNode(that.refs.container)).fadeOut(3000,function(){// ------------------FIX THIS TO REACT-------------------------- 
-		that.props.deleteFlat(that.props.id);
-		//});
+		that.props.deleteFlat(that.props.item.id);
+	},
+	togglePhoto: function(){
+		this.setState({
+			photoShown: !this.state.photoShown
+		});
 	},
 	render : function(){
 		var html,
 		commentClasses = classNames({
 			'ext-hidden': this.state.editing,
 			'cian-sidebar__comment': true
-		});
-		if(this.props.cached){
+		}),
+		photoClasses = classNames({
+			'cian-sidebar__photo_shown': this.state.photoShown,
+			'cian-sidebar__photo': true
+		}),
+		photo = this.props.item.photo ? (
+			<div className="cian-sidebar__photo-wrapper">
+				<span className="cian-sidebar__photo-toggle" onClick={this.togglePhoto}>{this.state.photoShown ? 'Скрыть фото' : 'Показать фото'}</span>
+				<div className={photoClasses}>
+					<img src={this.props.item.photo} />
+				</div>
+			</div>
+		) : '',
+		rooms = this.props.item.rooms ? (
+			<div className="cian-sidebar__rooms">{this.props.item.rooms} комн. кв.</div>
+		) : '';
+
+		if(this.props.item.cached){
 			html = (
 				<div className="cian-sidebar__flat" ref="container">
 					<div className="cian-sidebar__info">
-						<div className="cian-sidebar__adress">{this.props.adress}</div>
-						<div className="cian-sidebar__price">{this.props.price}</div>
+						<div className="cian-sidebar__adress">{this.props.item.adress}</div>
+						<div className="cian-sidebar__price">{this.props.item.price}</div>
+						{rooms}
 						<form onSubmit={this.inputBlur} >
 							<input ref="commentInput" 
 								onChange={this.handleChange} 
@@ -64,6 +85,7 @@ var Flat = React.createClass({
 						<div className={commentClasses} >	
 							<span>{this.state.comment}</span> 
 						</div>
+						{photo}
 					</div>
 					<div className="cian-sidebar__actions">
 						<span onClick={this.handleDelete} className="cian-sidebar__icon cian-sidebar__icon_remove"></span>
