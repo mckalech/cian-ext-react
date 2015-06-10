@@ -3,7 +3,7 @@ module.exports = function(grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 		browserify:     {
 			options:{
-				transform:  [ require('grunt-react').browserify ]
+				transform:  [ require('grunt-react').browserify]
 			},
 			app: {
 				src: 'ext/src/js/app/app.js',

@@ -1,7 +1,6 @@
 
 var Storage = require('./storage'),
 	$ = require('jQuery'),
-	_ = require('underscore'),
 	React = require('React'),
 	Flat = require('./flatview'),
 	ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
